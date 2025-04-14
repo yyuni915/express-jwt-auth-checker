@@ -5,18 +5,18 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { authToken } = require('./middleware/token');
 const db = require('./db/connection');
+
 const app = express();
-
 app.use(express.json());
-const port = process.env.PORT || 80; 
-
-
 app.use(
   cors({
     origin: true,
     credentials: true
   })
 );
+
+// Load credentials from .env or use default
+const port = process.env.PORT || 3000; 
 
 // Load credentials from .env or use default
 const VALID_USER = process.env.ADMIN_USER || 'guest';
@@ -37,19 +37,17 @@ app.get('/', (req, res) => {
 });
 
 app.get('/status', authToken, (req, res) => {
-  if (req.username) { 
-    db.query('use test', (err) => {
+  if (!req.username) return res.status(401).send('Unauthorized');
+
+  try {
+    db.query('SELECT 1', (err) => {
       if (err) {
-        return res.status(200).send({
-          isLogin: true,
-          isConnectedToDatabase: false
-        });
+        return res.status(200).send({ isLogin: true, isConnectedToDatabase: false });
       }
-      return res.status(200).send({
-        isLogin: true,
-        isConnectedToDatabase: true
-      });
+      return res.status(200).send({ isLogin: true, isConnectedToDatabase: true });
     });
+  } catch {
+    return res.status(200).send({ isLogin: true, isConnectedToDatabase: false });
   }
 });
 
