@@ -1,12 +1,15 @@
+require('dotenv').config(); 
+
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { authToken } = require('./middleware/token');
 const db = require('./db/connection');
-
 const app = express();
+
 app.use(express.json());
-const port = 80;
+const port = process.env.PORT || 80; 
+
 
 app.use(
   cors({
@@ -15,13 +18,17 @@ app.use(
   })
 );
 
+// Load credentials from .env or use default
+const VALID_USER = process.env.ADMIN_USER || 'guest';
+const VALID_PASS = process.env.ADMIN_PASS || '1234';
+
 app.post('/signin', (req, res) => {
   const { username, password } = req.body;
-  if (username === '김코딩' && password === '1234') {
-    const accessToken = jwt.sign({ username }, 'secretKey', { expiresIn: '1days' });
+  if (username === VALID_USER && password === VALID_PASS) {
+    const accessToken = jwt.sign({ username }, 'secretKey', { expiresIn: '1d' });
     res.status(201).send(accessToken);
   } else {
-    res.status(401).send('Login Failed');
+    res.status(401).send('Login failed. Invalid credentials.');
   }
 });
 
@@ -29,9 +36,8 @@ app.get('/', (req, res) => {
   res.status(201).send('Hello World');
 });
 
-console.log('Hello World');
 app.get('/status', authToken, (req, res) => {
-  if (req.username) { // jwt 토큰이 존재할 경우 데이터베이스 연결 여부 조회
+  if (req.username) { 
     db.query('use test', (err) => {
       if (err) {
         return res.status(200).send({
@@ -48,5 +54,5 @@ app.get('/status', authToken, (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`서버가 ${port}번에서 작동중입니다.`);
+  console.log(`Server is running on port ${port}`);
 });
