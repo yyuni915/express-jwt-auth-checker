@@ -78,6 +78,7 @@ Response:
 isConnectedToDatabase always returns false unless connected to a real database.
 
 ### Project Structure
+```bash
 server/
 ├── app.js
 ├── middleware/
@@ -88,6 +89,7 @@ server/
 ├── .gitignore
 ├── package.json
 └── README.md
+```
 
 ### Notes
 This project is meant for learning/demo purposes. In production, make sure to:
