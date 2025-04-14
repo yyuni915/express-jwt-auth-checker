@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const jwtSecret = process.env.JWT_SECRET; 
 
 module.exports = {
 
@@ -12,7 +13,7 @@ module.exports = {
       return res.status(401).send('Not Authorized');
     } 
 
-    jwt.verify(accessToken, 'secretKey', (err, decoded) => {
+    jwt.verify(accessToken, jwtSecret, (err, decoded) => {
       if (err) {
         return res.status(403).send('Token Invalid');
       } else {

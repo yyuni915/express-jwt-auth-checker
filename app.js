@@ -22,10 +22,12 @@ const port = process.env.PORT || 3000;
 const VALID_USER = process.env.ADMIN_USER || 'guest';
 const VALID_PASS = process.env.ADMIN_PASS || '1234';
 
+const jwtSecret = process.env.JWT_SECRET; 
+
 app.post('/signin', (req, res) => {
   const { username, password } = req.body;
   if (username === VALID_USER && password === VALID_PASS) {
-    const accessToken = jwt.sign({ username }, 'secretKey', { expiresIn: '1d' });
+    const accessToken = jwt.sign({ username }, jwtSecret, { expiresIn: '1d' });
     res.status(201).send(accessToken);
   } else {
     res.status(401).send('Login failed. Invalid credentials.');
